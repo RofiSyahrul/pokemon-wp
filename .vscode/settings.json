@@ -16,5 +16,13 @@
   "html.autoClosingTags": true,
   "extensions.ignoreRecommendations": false,
   "files.autoSave": "off",
-  "rewrap.wrappingColumn": 75
+  "rewrap.wrappingColumn": 75,
+  "codemetrics.nodeconfiguration.JsxSelfClosingElement": 0,
+  "codemetrics.nodeconfiguration.ReturnStatement": 0,
+  "codemetrics.nodeconfiguration.DefaultClause": 0,
+  "codemetrics.nodeconfiguration.CaseClause": 0,
+  "codemetrics.nodeconfiguration.SwitchStatement": 0,
+  "codemetrics.nodeconfiguration.BreakStatement": 0,
+  "codemetrics.nodeconfiguration.ObjectLiteralExpression": 0,
+  "codemetrics.nodeconfiguration.ArrowFunction": 0
 }

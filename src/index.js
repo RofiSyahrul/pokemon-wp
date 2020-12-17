@@ -1,7 +1,9 @@
 /* eslint-disable no-console */
 import React from 'react';
 import ReactDOM from 'react-dom';
+import 'isomorphic-unfetch';
 import App from './app';
+import './style.css';
 
 ReactDOM.render(<App />, document.getElementById('app'));
 

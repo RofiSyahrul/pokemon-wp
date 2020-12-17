@@ -1,15 +1,20 @@
 import React from 'react';
-import { GoodsProvider } from 'goods-core';
-import ApolloInit from './apollo-init';
+import { GoodsProvider, overrideGoodsTheme } from 'goods-core';
+import { AppProvider } from './context/app.context';
+import Pages from './pages';
+
+const customTheme = overrideGoodsTheme({
+  breakpoints: { sm: '481px', md: '561px', xl: '1081px' },
+});
 
 /** @type {React.FC} */
 const App = () => {
   return (
-    <ApolloInit>
-      <GoodsProvider>
-        <h1>Welcome to Pokemon Explorer</h1>
-      </GoodsProvider>
-    </ApolloInit>
+    <GoodsProvider theme={customTheme}>
+      <AppProvider>
+        <Pages />
+      </AppProvider>
+    </GoodsProvider>
   );
 };
 

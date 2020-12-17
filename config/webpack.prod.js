@@ -1,7 +1,10 @@
 const WebpackCompression = require('compression-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const { GenerateSW } = require('workbox-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+const OptimizeCss = require('optimize-css-assets-webpack-plugin');
 
+console.log(process.env.BUILD_ENV);
 const isLocalBuild = /local/i.test(process.env.BUILD_ENV || '');
 
 const compression = new WebpackCompression({
@@ -23,6 +26,15 @@ const serviceWorker = new GenerateSW({
   skipWaiting: true,
 });
 
+const terser = new TerserPlugin({
+  cache: true,
+  parallel: true,
+  sourceMap: false,
+  terserOptions: { output: { comments: false } },
+});
+
+const optimizeCss = new OptimizeCss();
+
 /** @returns {import('webpack').WebpackPluginInstance[]} */
 function getPlugins() {
   const plugins = [copy, serviceWorker];
@@ -36,6 +48,10 @@ function getPlugins() {
 const prodConfig = {
   mode: 'production',
   plugins: getPlugins(),
+  optimization: {
+    minimize: true,
+    minimizer: [/* terser, */ optimizeCss],
+  },
   devServer: {
     contentBase: './dist',
     historyApiFallback: true,

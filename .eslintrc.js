@@ -25,7 +25,13 @@ module.exports = {
     'no-underscore-dangle': 'off',
     'no-restricted-syntax': 'off',
     'no-param-reassign': 'off',
-    'no-unused-vars': 'warn',
+    'no-unused-vars': [
+      'warn',
+      {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+      },
+    ],
     'no-nested-ternary': 0,
     'import/no-unresolved': [
       2,
@@ -73,6 +79,8 @@ module.exports = {
   globals: {
     __DEV__: 'readonly',
     BASE_URL: 'readonly',
+    BASE_IMAGE_URL: 'readonly',
+    PAGINATION_LIMIT: 'readonly',
   },
   settings: {
     'import/resolver': {

@@ -3,6 +3,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const PreloadWebpackPlugin = require('preload-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { config } = require('dotenv');
 const { alias, entry, env, root, src, dist } = require('../.paths');
 
@@ -35,6 +36,10 @@ const commonConfig = {
           esModule: false,
         },
       },
+      {
+        test: /\.css$/,
+        use: [MiniCssExtractPlugin.loader, 'css-loader'],
+      },
     ],
   },
   resolve: {
@@ -62,6 +67,12 @@ const commonConfig = {
     new DefinePlugin({
       __DEV__: process.env.NODE_ENV !== 'production',
       BASE_URL: JSON.stringify(process.env.BASE_URL),
+      BASE_IMAGE_URL: JSON.stringify(process.env.BASE_IMAGE_URL),
+      PAGINATION_LIMIT: Number(process.env.PAGINATION_LIMIT),
+    }),
+    new MiniCssExtractPlugin({
+      filename: '[name].[contenthash].css',
+      chunkFilename: '[id].[contenthash].css',
     }),
   ],
   output: {
