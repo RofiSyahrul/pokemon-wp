@@ -4,7 +4,6 @@ const { GenerateSW } = require('workbox-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCss = require('optimize-css-assets-webpack-plugin');
 
-console.log(process.env.BUILD_ENV);
 const isLocalBuild = /local/i.test(process.env.BUILD_ENV || '');
 
 const compression = new WebpackCompression({
@@ -50,7 +49,7 @@ const prodConfig = {
   plugins: getPlugins(),
   optimization: {
     minimize: true,
-    minimizer: [/* terser, */ optimizeCss],
+    minimizer: [terser, optimizeCss],
   },
   devServer: {
     contentBase: './dist',
