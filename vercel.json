@@ -3,6 +3,10 @@
     {
       "src": "/js/(.*)",
       "headers": { "Accept-Encoding": "gzip" }
+    },
+    {
+      "src": "/*",
+      "dest": "/index.html"
     }
   ]
 }
