@@ -3,7 +3,7 @@ import isEqual from 'react-fast-compare';
 import { Box, Skeleton, Text } from 'goods-core';
 import Link from 'atoms/link';
 import Card from 'molecules/card';
-import { capitalize } from 'src/utils/helpers';
+import { capitalize, formatNumber } from 'src/utils/helpers';
 import { useHome } from './home.hook';
 
 const placeholder = {
@@ -76,10 +76,10 @@ const PokemonAttributes = memo(({ weight, height, types }) => {
       </Box>
       <Box as='span' className='bottom-attribute'>
         <Text as='span' rule='caption' weight='bold' textAlign='right'>
-          {`Weight: ${weight} hg`}
+          {`Weight: ${formatNumber(weight)} hg`}
         </Text>
         <Text as='span' rule='caption' weight='bold' textAlign='right'>
-          {`Height: ${height} dm`}
+          {`Height: ${formatNumber(height)} dm`}
         </Text>
       </Box>
     </>
@@ -105,7 +105,7 @@ const Home = memo(() => {
       }}
     >
       {pokemons.map(({ id, name, image, types, weight, height }, i) => (
-        <Link key={`${id}-${name}-${i}`} to={name} w>
+        <Link key={`${id}-${name}-${i}`} to={`${id}`} w>
           <Card title={capitalize(name)} image={image}>
             <PokemonAttributes types={types} weight={weight} height={height} />
           </Card>

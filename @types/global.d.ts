@@ -1,3 +1,5 @@
+import { useLocation } from 'react-router-dom';
+
 export {};
 
 declare global {
@@ -45,7 +47,7 @@ declare global {
   };
 
   type DetailsPageParam = {
-    id: number;
+    id: string;
   };
 
   type ResourceItem = {
@@ -63,7 +65,6 @@ declare global {
     height: number;
     weight: number;
     abilities: { ability: { name: string } }[];
-    moves: { move: { name: string } }[];
     types: { type: { name: string } }[];
     stats: { base_stat: number; stat: { name: string } }[];
   };
@@ -75,9 +76,9 @@ declare global {
     height: number;
     weight: number;
     abilities: string[];
-    moves: string[];
     types: string[];
     stats: { base_stat: number; name: string }[];
+    totalScore: number;
   };
 
   type PokemonList = Pokemon[];
@@ -116,4 +117,26 @@ declare global {
     limit: number;
     offset: number;
   };
+
+  type GoToOptions = {
+    state?: Record<string, unknown>;
+    /** @default "push" */
+    method?: 'replace' | 'push';
+    /** @default true */
+    keepState?: boolean;
+  };
+
+  interface ParsedLocationReturn<
+    QS extends Record<keyof QS, any> | Record<keyof QS, string> = Record<
+      string,
+      string | number | boolean
+    >,
+    Params extends { [K in keyof Params]?: string } = Record<string, string>
+  > extends ReturnType<typeof useLocation> {
+    state: Partial<Record<string, unknown>>;
+    params: Params;
+    parsedQs: QS;
+    goTo(to: string | QS, opts?: GoToOptions): void;
+    getHref(to: string | QS): string | undefined;
+  }
 }

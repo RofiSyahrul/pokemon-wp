@@ -20,6 +20,7 @@ const initialState = {
   allPokemonList: storage.allPokemonList,
   filterRecords: storage.filterRecords,
   matchPredictions: storage.matchPredictions,
+  sidebarCollapsed: window.innerWidth <= 1080,
 };
 
 /** @type {FilterKey[]} */
@@ -81,6 +82,9 @@ function recipe(draft, action) {
         storage.matchPredictions = draft.matchPredictions;
       }
       return;
+    case 'TOGGLE_SIDEBAR':
+      draft.sidebarCollapsed = !draft.sidebarCollapsed;
+      return;
     default:
       throw new Error('Unknown action type');
   }
@@ -93,7 +97,7 @@ const reducer = produce(recipe);
 /** @returns {ContextValue} */
 function useApp() {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { filterRecords, matchPredictions } = state;
+  const { filterRecords, matchPredictions, allPokemonList } = state;
 
   /** @type {Dispatch['savePokemonList']} */
   const savePokemonList = useCallback(pokemonList => {
@@ -123,6 +127,7 @@ function useApp() {
     [filterRecords]
   );
 
+  /** @type {Dispatch['getMatchPrediction']} */
   const getMatchPrediction = useCallback(
     pokemonIds => {
       if (pokemonIds[0] === pokemonIds[1] || !pokemonIds[1]) return null;
@@ -134,6 +139,19 @@ function useApp() {
     [matchPredictions]
   );
 
+  /** @type {Dispatch['getPokemonDetail']} */
+  const getPokemonDetail = useCallback(
+    id => {
+      const pokemonDetail = allPokemonList.find(pokemon => pokemon.id === id);
+      return pokemonDetail || null;
+    },
+    [allPokemonList]
+  );
+
+  const toggleSidebar = useCallback(() => {
+    dispatch({ type: 'TOGGLE_SIDEBAR' });
+  }, []);
+
   /** @type {ContextValue} */
   const contextValue = useMemo(
     () => ({
@@ -144,9 +162,11 @@ function useApp() {
         saveMatchPrediction,
         getFilteredPokemons,
         getMatchPrediction,
+        getPokemonDetail,
+        toggleSidebar,
       },
     }),
-    [state, getFilteredPokemons, getMatchPrediction]
+    [state, getFilteredPokemons, getMatchPrediction, getPokemonDetail]
   );
 
   return contextValue;
@@ -160,10 +180,14 @@ const AppDispatchContext = createContext({
   saveFilterRecord() {},
   saveMatchPrediction() {},
   increaseOffset() {},
+  toggleSidebar() {},
   getFilteredPokemons() {
     return [];
   },
   getMatchPrediction() {
+    return null;
+  },
+  getPokemonDetail() {
     return null;
   },
 });

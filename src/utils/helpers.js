@@ -79,6 +79,19 @@ export function capitalize(str = '') {
   return str.toLowerCase().replace(/(^|\s)\S/g, v => v.toUpperCase());
 }
 
+/**
+ * @param {string | number} value
+ * @returns {string}
+ */
+export function formatNumber(value = '') {
+  if (typeof value !== 'number') value = parseFloat(value);
+  if (Number.isNaN(value)) return '';
+  return value.toLocaleString('en-US', {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
+  });
+}
+
 export function getId(url = '') {
   return url
     .split('/')
@@ -107,7 +120,7 @@ export async function getPokemonOverview({ url }) {
   const res = await fetch(url);
   /** @type {PokemonRes} */
   const response = await res.json();
-  const { id, name, weight, height, abilities, stats, moves, types } = response;
+  const { id, name, weight, height, abilities, stats, types } = response;
   return {
     id,
     image,
@@ -115,11 +128,11 @@ export async function getPokemonOverview({ url }) {
     weight,
     height,
     abilities: abilities.map(item => item.ability.name),
-    moves: moves.map(item => item.move.name),
     types: types.map(item => item.type.name),
     stats: stats.map(item => ({
       base_stat: item.base_stat,
       name: item.stat.name,
     })),
+    totalScore: stats.reduce((acc, item) => acc + item.base_stat, 0),
   };
 }

@@ -2,11 +2,11 @@ import { useCallback, useMemo } from 'react';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { mergeQs, parseQs } from 'src/utils/helpers';
 
-function isExternalLink(to = '') {
+export function isExternalLink(to = '') {
   return ['http', 'mailto:', 'tel:'].some(prefix => to.startsWith(prefix));
 }
 
-/** @returns {import('./parsed-location').ParsedLocationReturn} */
+/** @returns {ParsedLocationReturn} */
 export function useParsedLocation() {
   const location = useLocation();
   const history = useHistory();
@@ -42,7 +42,7 @@ export function useParsedLocation() {
     [pathname, search]
   );
 
-  /** @type {import('./parsed-location').ParsedLocationReturn['goTo']} */
+  /** @type {ParsedLocationReturn['goTo']} */
   const goTo = useCallback(
     (to = '', opts) => {
       if (!to) return;

@@ -1,5 +1,4 @@
 import { BoxProps, TextCssProps } from 'goods-core';
-import { GoToOptions } from 'src/hooks/parsed-location';
 
 export interface LinkProps
   extends BoxProps,
