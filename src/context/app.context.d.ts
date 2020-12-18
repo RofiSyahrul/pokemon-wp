@@ -2,20 +2,16 @@ export type State = {
   sidebarCollapsed: boolean;
   offset: number;
   allPokemonList: PokemonList;
-  filterRecords: FilterItem[];
-  matchPredictions: MatchPrediction[];
+  abilityOptions: OptionItem[];
+  typeOptions: OptionItem[];
 };
 
-type ActionType =
-  | 'ADD_POKEMONS'
-  | 'ADD_FILTER_RECORD'
-  | 'ADD_MATCH_PREDICTION'
-  | 'TOGGLE_SIDEBAR';
+type ActionType = 'ADD_POKEMONS' | 'TOGGLE_SIDEBAR' | 'SET_FILTER_OPTIONS';
 
 type ActionPayload = {
   pokemonList: PokemonList;
-  filterRecord: { key: FilterKey; result: FilterResult };
-  matchPrediction: MatchPrediction;
+  abilityOptions: OptionItem[];
+  typeOptions: OptionItem[];
 };
 
 export type Action = {
@@ -25,10 +21,6 @@ export type Action = {
 
 export interface Dispatch {
   savePokemonList(pokemonList: PokemonList): void;
-  saveFilterRecord(filterRecord: ActionPayload['filterRecord']): void;
-  saveMatchPrediction(matchPrediction: MatchPrediction): void;
-  getFilteredPokemons(key: FilterKey, name: string): PokemonList;
-  getMatchPrediction(pokemonIds: [number, number]): MatchPrediction | null;
   getPokemonDetail(id: number): Pokemon | null;
   toggleSidebar(): void;
 }

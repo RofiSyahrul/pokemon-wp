@@ -34,20 +34,20 @@ const storage = {
     saveList('all-pokemon-list', list);
   },
 
-  /** @returns {FilterItem[]} */
-  get filterRecords() {
-    return getList('filter-records');
+  /** @returns {OptionItem[]} */
+  get abilityOptions() {
+    return getList('ability-options');
   },
-  set filterRecords(list) {
-    saveList('filter-records', list);
+  set abilityOptions(list) {
+    saveList('ability-options', list);
   },
 
-  /** @returns {MatchPrediction[]} */
-  get matchPredictions() {
-    return getList('match-predictions');
+  /** @returns {OptionItem[]} */
+  get typeOptions() {
+    return getList('type-options');
   },
-  set matchPredictions(list) {
-    saveList('match-predictions', list);
+  set typeOptions(list) {
+    return saveList('type-options', list);
   },
 };
 

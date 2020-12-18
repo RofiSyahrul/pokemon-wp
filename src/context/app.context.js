@@ -2,11 +2,13 @@ import React, {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useReducer,
 } from 'react';
 import produce from 'immer';
 import storage from 'src/utils/storage';
+import { getId } from 'src/utils/helpers';
 
 /**
  * @typedef {import('./app.context').State} State
@@ -18,13 +20,10 @@ import storage from 'src/utils/storage';
 const initialState = {
   offset: storage.offset,
   allPokemonList: storage.allPokemonList,
-  filterRecords: storage.filterRecords,
-  matchPredictions: storage.matchPredictions,
+  abilityOptions: storage.abilityOptions,
+  typeOptions: storage.typeOptions,
   sidebarCollapsed: window.innerWidth <= 1080,
 };
-
-/** @type {FilterKey[]} */
-const filterKeys = ['ability', 'move', 'type'];
 
 /**
  *
@@ -32,9 +31,8 @@ const filterKeys = ['ability', 'move', 'type'];
  * @param {Action} action
  */
 function recipe(draft, action) {
-  const { filterRecords, matchPredictions } = draft;
   const { type, payload = {} } = action;
-  const { pokemonList, filterRecord, matchPrediction } = payload;
+  const { pokemonList, abilityOptions, typeOptions } = payload;
   switch (type) {
     case 'ADD_POKEMONS':
       if (Array.isArray(pokemonList)) {
@@ -44,46 +42,16 @@ function recipe(draft, action) {
         storage.offset = draft.offset;
       }
       return;
-    case 'ADD_FILTER_RECORD':
-      if (typeof filterRecord === 'object') {
-        const { key, result } = filterRecord;
-        if (!filterKeys.includes(key)) return;
-        const index = filterRecords.findIndex(record => record.key === key);
-        if (index === -1) {
-          draft.filterRecords.push({ key, results: [result] });
-          storage.filterRecords = draft.filterRecords;
-          return;
-        }
-        const { name } = result;
-        const { results } = filterRecords[index];
-        const resultIdx = results.findIndex(item => item.name === name);
-        if (resultIdx === -1) {
-          results.push(result);
-        } else {
-          results.splice(resultIdx, 1, result);
-        }
-        draft.filterRecords.splice(index, 1, { key, results });
-        storage.filterRecords = draft.filterRecords;
-      }
-      return;
-    case 'ADD_MATCH_PREDICTION':
-      if (typeof matchPrediction === 'object') {
-        const { pokemonIds } = matchPrediction;
-        if (pokemonIds[0] === pokemonIds[1] || !pokemonIds[1]) return;
-        const index = matchPredictions.findIndex(item =>
-          item.pokemonIds.every(id => pokemonIds.includes(id))
-        );
-        if (index === -1) {
-          draft.matchPredictions.push(matchPrediction);
-          storage.matchPredictions = draft.matchPredictions;
-          return;
-        }
-        draft.matchPredictions.splice(index, 1, matchPrediction);
-        storage.matchPredictions = draft.matchPredictions;
-      }
-      return;
     case 'TOGGLE_SIDEBAR':
       draft.sidebarCollapsed = !draft.sidebarCollapsed;
+      return;
+    case 'SET_FILTER_OPTIONS':
+      if (Array.isArray(abilityOptions) && Array.isArray(typeOptions)) {
+        storage.abilityOptions = abilityOptions;
+        storage.typeOptions = typeOptions;
+        draft.abilityOptions = abilityOptions;
+        draft.typeOptions = typeOptions;
+      }
       return;
     default:
       throw new Error('Unknown action type');
@@ -97,47 +65,14 @@ const reducer = produce(recipe);
 /** @returns {ContextValue} */
 function useApp() {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { filterRecords, matchPredictions, allPokemonList } = state;
+  const { typeOptions, abilityOptions, allPokemonList } = state;
+  const isAnyFilterOptions =
+    typeOptions.length > 0 && abilityOptions.length > 0;
 
   /** @type {Dispatch['savePokemonList']} */
   const savePokemonList = useCallback(pokemonList => {
     dispatch({ type: 'ADD_POKEMONS', payload: { pokemonList } });
   }, []);
-
-  /** @type {Dispatch['saveFilterRecord']} */
-  const saveFilterRecord = useCallback(filterRecord => {
-    dispatch({ type: 'ADD_FILTER_RECORD', payload: { filterRecord } });
-  }, []);
-
-  /** @type {Dispatch['saveMatchPrediction']} */
-  const saveMatchPrediction = useCallback(matchPrediction => {
-    dispatch({ type: 'ADD_MATCH_PREDICTION', payload: { matchPrediction } });
-  }, []);
-
-  /** @type {Dispatch['getFilteredPokemons']} */
-  const getFilteredPokemons = useCallback(
-    (key, name) => {
-      const filterRecord = filterRecords.find(item => item.key === key);
-      if (!filterRecord) return [];
-      const { results } = filterRecord;
-      const result = results.find(item => item.name === name);
-      if (!result) return [];
-      return result.pokemonList;
-    },
-    [filterRecords]
-  );
-
-  /** @type {Dispatch['getMatchPrediction']} */
-  const getMatchPrediction = useCallback(
-    pokemonIds => {
-      if (pokemonIds[0] === pokemonIds[1] || !pokemonIds[1]) return null;
-      const matchPrediction = matchPredictions.find(item =>
-        item.pokemonIds.every(id => pokemonIds.includes(id))
-      );
-      return matchPrediction || null;
-    },
-    [matchPredictions]
-  );
 
   /** @type {Dispatch['getPokemonDetail']} */
   const getPokemonDetail = useCallback(
@@ -158,16 +93,40 @@ function useApp() {
       state,
       dispatch: {
         savePokemonList,
-        saveFilterRecord,
-        saveMatchPrediction,
-        getFilteredPokemons,
-        getMatchPrediction,
         getPokemonDetail,
         toggleSidebar,
       },
     }),
-    [state, getFilteredPokemons, getMatchPrediction, getPokemonDetail]
+    [state, getPokemonDetail]
   );
+
+  useEffect(() => {
+    if (!isAnyFilterOptions) {
+      const promises = [
+        fetch(`${BASE_URL}/ability?limit=327&offset=0`),
+        fetch(`${BASE_URL}/type?limit=20&offset=0`),
+      ];
+      Promise.all(promises).then(async responses => {
+        /** @type {ResourceRes[]} */
+        const responsesData = await Promise.all(
+          responses.map(res => res.json())
+        );
+        const filterOptionsData = responsesData.map(res =>
+          res.results.map(({ name, url }) => {
+            const id = getId(url);
+            return { key: `${name}-${id}`, label: name, value: name };
+          })
+        );
+        dispatch({
+          type: 'SET_FILTER_OPTIONS',
+          payload: {
+            abilityOptions: filterOptionsData[0],
+            typeOptions: filterOptionsData[1],
+          },
+        });
+      });
+    }
+  }, [isAnyFilterOptions]);
 
   return contextValue;
 }
@@ -177,16 +136,7 @@ const AppStateContext = createContext(initialState);
 /** @type {React.Context<Dispatch>} */
 const AppDispatchContext = createContext({
   savePokemonList() {},
-  saveFilterRecord() {},
-  saveMatchPrediction() {},
-  increaseOffset() {},
   toggleSidebar() {},
-  getFilteredPokemons() {
-    return [];
-  },
-  getMatchPrediction() {
-    return null;
-  },
   getPokemonDetail() {
     return null;
   },

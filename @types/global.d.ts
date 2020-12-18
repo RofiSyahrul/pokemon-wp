@@ -1,4 +1,5 @@
 import { useLocation } from 'react-router-dom';
+import { OptionItem as OptionItemGoods } from 'goods-ui';
 
 export {};
 
@@ -20,9 +21,9 @@ declare global {
 
   type StorageKey =
     | 'all-pokemon-list'
-    | 'filter-records'
-    | 'match-predictions'
     | 'offset'
+    | 'ability-options'
+    | 'type-options'
     | (string & {});
 
   interface Storage {
@@ -31,15 +32,22 @@ declare global {
     setItem(key: StorageKey, value: string): void;
   }
 
+  type SetState<S = {}> = React.Dispatch<React.SetStateAction<S>>;
+
   type ObjectBase = { [x: string]: unknown };
 
-  type FilterKey = 'ability' | 'type' | 'move';
+  type FilterKey = 'ability' | 'type';
+
+  type OptionItem = OptionItemGoods;
+
+  type OnChangeDropdown = (
+    arg: OptionItem & { name: string; event: React.MouseEvent }
+  ) => void;
 
   type HomePageQS = {
-    filterBy: FilterKey[];
+    filterBy: FilterKey;
     ability: string;
     type: string;
-    move: string;
   };
 
   type DetailsPageQS = {
@@ -83,6 +91,10 @@ declare global {
 
   type PokemonList = Pokemon[];
 
+  type AttributeRes = {
+    pokemon: { pokemon: ResourceItem }[];
+  };
+
   type FilterResult = {
     name: string;
     pokemonList: PokemonList;
@@ -100,7 +112,7 @@ declare global {
   };
 
   type FetchDataFn<TData = ObjectBase, TParams = ObjectBase> = (
-    params?: TParams
+    params?: TParams | string
   ) => Promise<TData | null>;
 
   type LazyFetchState = {

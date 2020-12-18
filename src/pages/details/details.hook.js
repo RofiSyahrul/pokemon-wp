@@ -6,7 +6,7 @@ import { useAppDispatch, useAppState } from 'src/context/app.context';
 
 /** @typedef {Pokemon & { loading: boolean, errorMessage: string }} PokemonDetailState */
 
-/** @typedef {React.Dispatch<React.SetStateAction<PokemonDetailState>>} SetPokemonDetail */
+/** @typedef {SetState<PokemonDetailState>} SetPokemonDetail */
 
 /** @param {number} id */
 function usePokemonDetail(id) {

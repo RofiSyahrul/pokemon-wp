@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import isEqual from 'react-fast-compare';
-import { Box, Spinner, Text } from 'goods-core';
+import { Box, mergeClass, Spinner, Text } from 'goods-core';
 import LazyImage from 'atoms/lazy-image';
 import { capitalize, formatNumber } from 'src/utils/helpers';
 import pokeBallImg from 'src/img/pokeball-sm.png';
@@ -15,7 +15,7 @@ import pokeBallImg from 'src/img/pokeball-sm.png';
 const AttributeList = memo(({ title, attributes }) => {
   return (
     <Box w>
-      <Text as='h5' rule='body' weight='bold' className='fade'>
+      <Text as='h5' rule='body' weight='bold'>
         {title}
       </Text>
       <Box
@@ -27,7 +27,7 @@ const AttributeList = memo(({ title, attributes }) => {
       >
         {attributes.map(attribute => (
           <Box key={attribute} as='li' d='list-item'>
-            <Text as='span' className='fade' rule='body'>
+            <Text as='span' rule='body'>
               {attribute}
             </Text>
           </Box>
@@ -70,6 +70,7 @@ const PokemonDetail = memo(
     return (
       <Box
         as='section'
+        className='pokemon-detail-container'
         w
         radius='l'
         shadow='low'
@@ -100,7 +101,6 @@ const PokemonDetail = memo(
               dRule='subtitle'
               textAlign='center'
               c='black40'
-              className='fade'
             >
               {capitalize(name)}
             </Text>
@@ -112,14 +112,16 @@ const PokemonDetail = memo(
               gap='16px'
               gAutoFlow='row'
               fJustify={{ xs: 'center', sm: 'flex-start' }}
-              className={compareMode ? 'grid-compare-mode' : ''}
+              className={mergeClass(
+                compareMode ? 'grid-compare-mode' : '',
+                'grid-pokemon-detail'
+              )}
             >
               <LazyImage
                 src={image}
                 alt={`Image of ${name}`}
                 s='160px'
                 objectFit='contain'
-                aName='fade'
               />
               <AttributeList
                 title='Basic attributes'

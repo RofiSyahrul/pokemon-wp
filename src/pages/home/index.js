@@ -3,11 +3,13 @@ import isEqual from 'react-fast-compare';
 import { Box, Skeleton, Text } from 'goods-core';
 import Link from 'atoms/link';
 import Card from 'molecules/card';
+import Header from 'organisms/header';
+import Sidebar from 'organisms/sidebar';
 import { capitalize, formatNumber } from 'src/utils/helpers';
 import { useHome } from './home.hook';
 
 const placeholder = {
-  pokemons: Array.from({ length: 12 }, (_, i) => i),
+  pokemons: Array.from({ length: 6 }, (_, i) => i),
   attributes: Array.from(
     { length: Math.floor(1 + Math.random() * 2) },
     (_, i) => `${i % 2 ? '56px' : '48px'}`
@@ -87,32 +89,52 @@ const PokemonAttributes = memo(({ weight, height, types }) => {
 }, isEqual);
 
 const Home = memo(() => {
-  const { pokemons, loading } = useHome();
+  const { pokemons, loading, isFilter, sidebarCollapsed } = useHome();
   return (
-    <Box
-      as='main'
-      w
-      p={{ xs: 's', lg: 'l' }}
-      d='grid'
-      gAutoFlow='row'
-      fJustify='center'
-      gap={{ xs: '16px', sm: '24px' }}
-      gTempCol={{
-        xs: '1fr',
-        sm: 'repeat(2, 1fr)',
-        lg: 'repeat(3, 1fr)',
-        xl: 'repeat(4, 1fr)',
-      }}
-    >
-      {pokemons.map(({ id, name, image, types, weight, height }, i) => (
-        <Link key={`${id}-${name}-${i}`} to={`${id}`} w>
-          <Card title={capitalize(name)} image={image}>
-            <PokemonAttributes types={types} weight={weight} height={height} />
-          </Card>
-        </Link>
-      ))}
-      {loading && <LoadingPlaceholder />}
-    </Box>
+    <>
+      <Header home />
+      <Sidebar />
+      <Box
+        as='main'
+        f={1}
+        w
+        p={{ xs: 's', lg: 'l' }}
+        pt='96px !important'
+        d='grid'
+        gAutoFlow='row'
+        fJustify='center'
+        gap={{ xs: '16px', sm: '24px' }}
+        gTempCol={{
+          xs: '1fr',
+          sm: 'repeat(2, 1fr)',
+          xl: 'repeat(3, 1fr)',
+        }}
+        {...(!sidebarCollapsed && {
+          pl: '292px !important',
+          d: { xs: 'none', lg: 'grid' },
+        })}
+      >
+        {isFilter && !loading && pokemons.length === 0 && (
+          <Box gCol='1 / span 3' w fAlign='center'>
+            <Text as='h2' rule='title' dRule='subtitle' textAlign='center'>
+              No pokemon found
+            </Text>
+          </Box>
+        )}
+        {pokemons.map(({ id, name, image, types, weight, height }, i) => (
+          <Link key={`${id}-${name}-${i}`} to={`${id}`} w>
+            <Card title={capitalize(name)} image={image}>
+              <PokemonAttributes
+                types={types}
+                weight={weight}
+                height={height}
+              />
+            </Card>
+          </Link>
+        ))}
+        {loading && <LoadingPlaceholder />}
+      </Box>
+    </>
   );
 });
 

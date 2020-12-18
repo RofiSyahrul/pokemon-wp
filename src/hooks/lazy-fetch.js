@@ -62,7 +62,7 @@ export function useLazyFetch(endpoint = '/') {
 
   /** @type {FetchDataFn} */
   const fetchData = useCallback(async (params = {}) => {
-    const qs = stringifyQs(params);
+    const qs = typeof params === 'string' ? params : stringifyQs(params);
     dispatch({ type: 'BEFORE_FETCH' });
     try {
       const res = await fetch(`${BASE_URL}${endpoint}${qs}`);
