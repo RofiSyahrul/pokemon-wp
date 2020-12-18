@@ -55,7 +55,7 @@ const LoadingPlaceholder = memo(() => {
 });
 
 /** @type {React.NamedExoticComponent<Pokemon>} */
-const PokemonAttributes = memo(({ weight, height, types }) => {
+const PokemonAttributes = memo(({ weight, height, types = [] }) => {
   return (
     <>
       <Box as='span' className='top-attribute'>
