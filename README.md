@@ -1,6 +1,8 @@
 # Demo
 
-[Demo link](https://pokemon-wp.rofisyahrul.com)
+- [Vercel](https://pokemon-wp.rofisyahrul.com)
+
+- [Netlify](https://pokemon-explorer-rofi.netlify.app/)
 
 # How to run in development mode
 
@@ -8,4 +10,4 @@
 2. Go to the folder e.g. `cd pokemon-wp`
 3. Run `npm install`
 4. Run `npm start`
-5. open `https://localhost:1234` in your favorite browser
+5. open `https://localhost:1234` in your browser
